@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   riverpod: ^2.5.0
   sqflite: ^2.3.2
+  dio: ^5.4.1
+  flutter_hooks: ^0.20.5
 
 dev_dependencies:
   flutter_test:
