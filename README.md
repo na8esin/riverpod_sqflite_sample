@@ -2,6 +2,8 @@
 
 タイトルそのまま
 
-## Getting Started
+## 利用しているapi
 - https://dummyjson.com/products/1
-- user_productsテーブル
+
+## テーブル
+- user_products
