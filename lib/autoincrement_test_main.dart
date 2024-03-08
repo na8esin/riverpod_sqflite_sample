@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'user_products.dart';
+import 'user_device/user_device.dart';
 
 // integer primary keyはautoincrementを指定しなくても
 // autoincrementされることの検証
@@ -16,10 +16,10 @@ Future<void> main() async {
   // 商用のコードではあまりやることはないはず。
   await deleteDatabase(path);
 
-  final repository = UserProductRepository();
+  final repository = UserDeviceRepository();
   await repository.open(path);
-  await repository.insert(const UserProduct());
-  await repository.insert(const UserProduct());
+  await repository.insert(const UserDevice(inUse: true));
+  await repository.insert(const UserDevice(inUse: false));
   final entities = await repository.findAll();
   print(entities);
 }

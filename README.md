@@ -6,4 +6,7 @@
 - https://dummyjson.com/products/1
 
 ## テーブル
-- user_products
+- user_devices
+
+## コマンド
+`dart run build_runner watch`
