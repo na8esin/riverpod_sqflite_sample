@@ -18,8 +18,8 @@ Future<void> main() async {
 
   final repository = UserDeviceRepository();
   await repository.open(path);
-  await repository.insert(const UserDevice(inUse: true));
-  await repository.insert(const UserDevice(inUse: false));
+  await repository.insert(const UserDevice(inUse: 1));
+  await repository.insert(const UserDevice(inUse: 0));
   final entities = await repository.findAll();
   print(entities);
 }

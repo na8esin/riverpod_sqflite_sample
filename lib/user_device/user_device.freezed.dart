@@ -21,7 +21,7 @@ UserDevice _$UserDeviceFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$UserDevice {
   int? get id => throw _privateConstructorUsedError;
-  bool get inUse => throw _privateConstructorUsedError;
+  int get inUse => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -35,7 +35,7 @@ abstract class $UserDeviceCopyWith<$Res> {
           UserDevice value, $Res Function(UserDevice) then) =
       _$UserDeviceCopyWithImpl<$Res, UserDevice>;
   @useResult
-  $Res call({int? id, bool inUse});
+  $Res call({int? id, int inUse});
 }
 
 /// @nodoc
@@ -62,7 +62,7 @@ class _$UserDeviceCopyWithImpl<$Res, $Val extends UserDevice>
       inUse: null == inUse
           ? _value.inUse
           : inUse // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as int,
     ) as $Val);
   }
 }
@@ -75,7 +75,7 @@ abstract class _$$UserDeviceImplCopyWith<$Res>
       __$$UserDeviceImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? id, bool inUse});
+  $Res call({int? id, int inUse});
 }
 
 /// @nodoc
@@ -100,7 +100,7 @@ class __$$UserDeviceImplCopyWithImpl<$Res>
       inUse: null == inUse
           ? _value.inUse
           : inUse // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as int,
     ));
   }
 }
@@ -116,7 +116,7 @@ class _$UserDeviceImpl with DiagnosticableTreeMixin implements _UserDevice {
   @override
   final int? id;
   @override
-  final bool inUse;
+  final int inUse;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -160,7 +160,7 @@ class _$UserDeviceImpl with DiagnosticableTreeMixin implements _UserDevice {
 }
 
 abstract class _UserDevice implements UserDevice {
-  const factory _UserDevice({final int? id, required final bool inUse}) =
+  const factory _UserDevice({final int? id, required final int inUse}) =
       _$UserDeviceImpl;
 
   factory _UserDevice.fromJson(Map<String, dynamic> json) =
@@ -169,7 +169,7 @@ abstract class _UserDevice implements UserDevice {
   @override
   int? get id;
   @override
-  bool get inUse;
+  int get inUse;
   @override
   @JsonKey(ignore: true)
   _$$UserDeviceImplCopyWith<_$UserDeviceImpl> get copyWith =>

@@ -24,7 +24,7 @@ Future<void> main() async {
 
 // busy: 使用中
 // unoccupied: 使用されてない
-enum DeviceListFilter { all, busy, unoccupied }
+enum DeviceState { all, busy, unoccupied }
 
 @riverpod
 Future<List<Product>?> combine(CombineRef ref) async {
@@ -42,15 +42,18 @@ Future<List<Product>?> combine(CombineRef ref) async {
 
 // final userDeviceListProvider;
 
-// フィルターの状態
+// フィルターの状態。
+// `StateProvider is to be avoided` と↓に書かれてるので書き換えてみた
+// https://riverpod.dev/ja/docs/migration/from_state_notifier#from-stateprovider
 @riverpod
 class ListFilterNotifier extends _$ListFilterNotifier {
   @override
-  int build() => 0;
+  DeviceState build() => DeviceState.all;
 
   @override
-  set state(int newState) => super.state = newState;
-  int update(int Function(int state) cb) => state = cb(state);
+  set state(DeviceState newState) => super.state = newState;
+  DeviceState update(DeviceState Function(DeviceState state) cb) =>
+      state = cb(state);
 }
 
 class MyApp extends HookConsumerWidget {
@@ -70,7 +73,6 @@ class MyApp extends HookConsumerWidget {
   }
 }
 
-// TODO: アイテムを追加した時に発火させるのどうやるんだ？
 class MyWidget extends HookConsumerWidget {
   const MyWidget({super.key});
 
@@ -79,18 +81,13 @@ class MyWidget extends HookConsumerWidget {
     final asyncProducts = ref.watch(combineProvider);
     return Center(
         child: asyncProducts.when(
-      data: (data) => ListView(
-        children: data
-                ?.map((e) => ListTile(
-                      title: Text(e.title),
-                    ))
-                .toList() ??
-            [
-              const Center(
-                child: Text('empty'),
-              )
-            ],
-      ),
+      data: (data) {
+        return ListView(
+          children: data == null
+              ? []
+              : [Toolbar(), for (var e in data) Text(e.title)],
+        );
+      },
       error: (_, error) {
         return const Text('error');
       },
@@ -101,18 +98,21 @@ class MyWidget extends HookConsumerWidget {
 
 class Toolbar extends HookConsumerWidget {
   const Toolbar({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final filter = ref.watch(listFilterProvider.notifier);
-
-//    final filterState = ref.read(listFilterProvider.notifier).state;
+    final filter = ref.watch(listFilterNotifierProvider.notifier);
 
     return Material(
-        child: ListView(
-      children: [TextButton(onPressed: () => filter.state = DeviceListFilter.all, child: Container())],
-    ));
+      child: Row(children: [
+        for (var value in DeviceState.values)
+          TextButton(
+            onPressed: () => filter.update((state) => value),
+            child: Text(value.name),
+          )
+      ]),
+    );
   }
 }

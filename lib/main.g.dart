@@ -21,12 +21,12 @@ final combineProvider = AutoDisposeFutureProvider<List<Product>?>.internal(
 
 typedef CombineRef = AutoDisposeFutureProviderRef<List<Product>?>;
 String _$listFilterNotifierHash() =>
-    r'355e633836a92e1e991ac4daeecdd3ac51bc499d';
+    r'95c031f8a9da2dfcb2ac7794559951d8f464465c';
 
 /// See also [ListFilterNotifier].
 @ProviderFor(ListFilterNotifier)
 final listFilterNotifierProvider =
-    AutoDisposeNotifierProvider<ListFilterNotifier, int>.internal(
+    AutoDisposeNotifierProvider<ListFilterNotifier, DeviceState>.internal(
   ListFilterNotifier.new,
   name: r'listFilterNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -36,6 +36,6 @@ final listFilterNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$ListFilterNotifier = AutoDisposeNotifier<int>;
+typedef _$ListFilterNotifier = AutoDisposeNotifier<DeviceState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

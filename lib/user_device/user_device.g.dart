@@ -9,7 +9,7 @@ part of 'user_device.dart';
 _$UserDeviceImpl _$$UserDeviceImplFromJson(Map<String, dynamic> json) =>
     _$UserDeviceImpl(
       id: json['id'] as int?,
-      inUse: json['inUse'] as bool,
+      inUse: json['inUse'] as int,
     );
 
 Map<String, dynamic> _$$UserDeviceImplToJson(_$UserDeviceImpl instance) =>
@@ -39,7 +39,7 @@ final allUserDevicesProvider =
 
 typedef AllUserDevicesRef = AutoDisposeFutureProviderRef<List<UserDevice>?>;
 String _$userDeviceRepositoryHash() =>
-    r'd8fafa6ca3c58c61da42f7d5eeb7bdbab3a8698c';
+    r'677eeead4803ec5d392c664d16fa189b49d21da9';
 
 /// See also [userDeviceRepository].
 @ProviderFor(userDeviceRepository)

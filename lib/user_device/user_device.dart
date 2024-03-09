@@ -10,7 +10,7 @@ part 'user_device.g.dart';
 
 const String _tableName = 'user_devices';
 const String columnId = 'id';
-const String columnInUse = 'in_use';
+const String columnInUse = 'inUse';
 const List<String> columns = [columnId, columnInUse];
 
 @riverpod
@@ -27,8 +27,8 @@ Future<UserDeviceRepository> userDeviceRepository(
   await repository.open(path);
 
   // データをあらかじめ２つくらい入れておく
-  repository.insert(const UserDevice(inUse: false));
-  repository.insert(const UserDevice(inUse: true));
+  repository.insert(const UserDevice(inUse: 0));
+  repository.insert(const UserDevice(inUse: 1));
   return repository;
 }
 
@@ -36,7 +36,7 @@ Future<UserDeviceRepository> userDeviceRepository(
 // とりあえず、idと利用状況。titleなどはapiから取得
 @freezed
 class UserDevice with _$UserDevice {
-  const factory UserDevice({int? id, required bool inUse}) = _UserDevice;
+  const factory UserDevice({int? id, required int inUse}) = _UserDevice;
 
   factory UserDevice.fromJson(Map<String, Object?> json) =>
       _$UserDeviceFromJson(json);
@@ -57,10 +57,14 @@ class UserDeviceRepository {
       // integer primary keyは結局ROWIDのエイリアスなので、
       // autoincrementは必要ないはず
       // see: https://www.sqlite.org/rowidtable.html
+
+      // boolを使うと下記のエラーが出るので、integerで代用
+      // Invalid argument false with type bool.
+      // Only num, String and Uint8List are supported. See https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md for details
       await db.execute('''
 create table $_tableName (
   $columnId integer primary key,
-  $columnInUse boolean
+  $columnInUse integer
   )
 ''');
     });
