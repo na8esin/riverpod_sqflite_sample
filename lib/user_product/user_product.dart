@@ -91,25 +91,14 @@ class UserProductRepository {
         where: '$columnId = ?', whereArgs: [userProduct.id]);
   }
 
+  // サンプルのため少し雑な気がする。
   Future<void> syncData(List<UserProduct> userProducts) async {
-    print("sync complete befor");
-
-    print("db.isOpen = ${db.isOpen}");
-
-    try {
-      // 全削除
-      final deleteCount = await db.delete(_tableName);
-      print(deleteCount);
-    } catch (e) {
-      print(e);
-    }
-
-    print("sync complete after delete.");
+    // 全削除
+    await db.delete(_tableName);
 
     // 全挿入
     final futures = [for (var e in userProducts) insert(e)];
     await Future.wait(futures);
-    print("sync complete ");
   }
 
   Future close() async => db.close();

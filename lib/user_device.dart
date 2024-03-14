@@ -33,8 +33,8 @@ class UserDevicesNotifier extends _$UserDevicesNotifier {
     final userProducts = await ref.watch(allUserProductsProvider.future);
 
     // このproviderが破棄されるタイミングでデータをDBに同期する
+    // 動作未確認
     ref.onDispose(() async {
-      print("hello ");
       await syncData();
     });
 
@@ -65,6 +65,9 @@ class UserDevicesNotifier extends _$UserDevicesNotifier {
           e
     ];
 
+    // sqliteに保存
+    await syncData();
+
     state = AsyncData(subsequent);
   }
 
@@ -72,18 +75,14 @@ class UserDevicesNotifier extends _$UserDevicesNotifier {
 
   // プロバイダーが破棄されたタイミングなどでsqliteのデータを同期する
   Future<void> syncData() async {
-    print("sync data");
-
     final repo = await ref.read(userProductRepositoryProvider.future);
     final previousState = await future;
     final userProducts = previousState
         ?.map((e) => UserProduct(id: e.id, inUse: e.inUse))
         .toList();
     if (userProducts == null) {
-      print("userProducts is null");
       return;
     } else {
-      print("userProducts is $userProducts");
     }
 
     repo.syncData(userProducts);
