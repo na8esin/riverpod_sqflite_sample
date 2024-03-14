@@ -6,20 +6,36 @@ part of 'main.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$combineHash() => r'0b4558cc913cfb6fba038c4fc1eaf568744e22f8';
+String _$filteredDevicesHash() => r'7e3f11afe32d3ce9c4eb29cd888fd1064935e804';
 
-/// See also [combine].
-@ProviderFor(combine)
-final combineProvider = AutoDisposeFutureProvider<List<Product>?>.internal(
-  combine,
-  name: r'combineProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$combineHash,
+/// See also [filteredDevices].
+@ProviderFor(filteredDevices)
+final filteredDevicesProvider =
+    AutoDisposeFutureProvider<List<UserDevice>?>.internal(
+  filteredDevices,
+  name: r'filteredDevicesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$filteredDevicesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef CombineRef = AutoDisposeFutureProviderRef<List<Product>?>;
+typedef FilteredDevicesRef = AutoDisposeFutureProviderRef<List<UserDevice>?>;
+String _$currentItemHash() => r'd3fe73d686047b1ec13a0e8599cd3870f7538486';
+
+/// See also [currentItem].
+@ProviderFor(currentItem)
+final currentItemProvider = AutoDisposeProvider<UserDevice>.internal(
+  currentItem,
+  name: r'currentItemProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$currentItemHash,
+  dependencies: const <ProviderOrFamily>[],
+  allTransitiveDependencies: const <ProviderOrFamily>{},
+);
+
+typedef CurrentItemRef = AutoDisposeProviderRef<UserDevice>;
 String _$listFilterNotifierHash() =>
     r'95c031f8a9da2dfcb2ac7794559951d8f464465c';
 

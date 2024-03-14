@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'products/products.dart';
-import 'user_device/user_device.dart';
+
+import 'insert_test_data.dart';
+import 'user_device.dart';
 
 part 'main.g.dart';
 
@@ -13,34 +15,16 @@ part 'main.g.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await insertTestData();
+
   runApp(const ProviderScope(
     child: MyApp(),
   ));
 }
 
-// TODO: この画面に表示するリストのstate. UserProducts
-// filter用のstate,
-// filterはどうやってかけよう。riverpodのsampleみたいにボタンにしようか
-
-// busy: 使用中
-// unoccupied: 使用されてない
+// busy: デバイスが使用中
+// unoccupied: デバイスが使用中でない
 enum DeviceState { all, busy, unoccupied }
-
-@riverpod
-Future<List<Product>?> combine(CombineRef ref) async {
-  final userProducts = await ref.watch(allUserDevicesProvider.future);
-  final userProductIds = userProducts?.map((e) => e.id);
-
-  if (userProductIds == null) return null;
-
-  // 本当は、必要な分だけパラメータを与えて取れればいいけど、
-  // そういうパラメータがなかった
-  final products = await ref.watch(allProductsProvider.future);
-
-  return products?.where((e) => userProductIds.contains(e.id)).toList();
-}
-
-// final userDeviceListProvider;
 
 // フィルターの状態。
 // `StateProvider is to be avoided` と↓に書かれてるので書き換えてみた
@@ -56,11 +40,48 @@ class ListFilterNotifier extends _$ListFilterNotifier {
       state = cb(state);
 }
 
-class MyApp extends HookConsumerWidget {
+@riverpod
+Future<List<UserDevice>?> filteredDevices(FilteredDevicesRef ref) async {
+  final filter = ref.watch(listFilterNotifierProvider);
+  final devices = await ref.watch(userDevicesNotifierProvider.future);
+
+  switch (filter) {
+    case DeviceState.busy:
+      return devices?.where((e) => e.inUseToBool()).toList();
+    case DeviceState.unoccupied:
+      return devices?.where((e) => !e.inUseToBool()).toList();
+    case DeviceState.all:
+      return devices;
+  }
+}
+
+class MyApp extends StatefulHookConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _MyAppState();
+  }
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  late final AppLifecycleListener _listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future(() async {
+      final notifier = ref.read(userDevicesNotifierProvider.notifier);
+      SchedulerBinding.instance.lifecycleState;
+      _listener = AppLifecycleListener(
+        onPause: () async => await notifier.syncData(),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -71,6 +92,13 @@ class MyApp extends HookConsumerWidget {
           body: MyWidget(),
         ));
   }
+
+  @override
+  void dispose() {
+    _listener.dispose();
+    super.dispose();
+    print("widget dispose");
+  }
 }
 
 class MyWidget extends HookConsumerWidget {
@@ -78,21 +106,61 @@ class MyWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncProducts = ref.watch(combineProvider);
+    final asyncDevices = ref.watch(filteredDevicesProvider);
     return Center(
-        child: asyncProducts.when(
-      data: (data) {
-        return ListView(
-          children: data == null
-              ? []
-              : [Toolbar(), for (var e in data) Text(e.title)],
-        );
-      },
-      error: (_, error) {
-        return const Text('error');
-      },
-      loading: () => const Text('Loading...'),
-    ));
+        child: asyncDevices.when(
+            data: (devices) {
+              return ListView(
+                children: devices == null
+                    ? []
+                    : [
+                        const Toolbar(),
+                        for (var e in devices)
+                          ProviderScope(
+                            overrides: [
+                              currentItemProvider.overrideWithValue(e)
+                            ],
+                            child: const Item(),
+                          ),
+                      ],
+              );
+            },
+            error: (_, error) => Text(error.toString()),
+            loading: () => const CircularProgressIndicator()));
+  }
+}
+
+@Riverpod(dependencies: [])
+UserDevice currentItem(CurrentItemRef ref) {
+  throw UnimplementedError();
+}
+
+class Item extends HookConsumerWidget {
+  const Item({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userDevice = ref.watch(currentItemProvider);
+
+    return Material(
+      color: Colors.white,
+      elevation: 6,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListTile(
+          title: Text(userDevice.name),
+          leading: Checkbox(
+              value: userDevice.inUseToBool(),
+              onChanged: (_) {
+                if (userDevice.id != null) {
+                  ref
+                      .read(userDevicesNotifierProvider.notifier)
+                      .toggle(userDevice.id!);
+                }
+              }),
+        ),
+      ),
+    );
   }
 }
 

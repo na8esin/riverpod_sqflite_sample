@@ -2,7 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-import 'products/products.dart';
+import '../products/products.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
